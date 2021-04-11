@@ -114,3 +114,33 @@ func TestService_Repeat_success_user(t *testing.T) {
 	t.Errorf("Repeat(): can't payment for an account(%v), error(%v)",pay.ID, err)
 	}
 	}
+	func TestService_FavoritePayment_success_user(t *testing.T) {
+		//создаем сервис
+		var s Service
+	
+		account, err := s.RegisterAccount("+9922000000")
+		if err != nil {
+			t.Errorf("method RegisterAccount return not nil error, account=>%v", account)
+			return
+		}
+		//пополняем баланс
+		err = s.Deposit(account.ID, 1000_00)
+		if err != nil {
+			t.Errorf("method Deposit return not nil error, error=>%v", err)
+		}
+		//pay
+		payment, err := s.Pay(account.ID, 100_00, "auto")
+		if err != nil {
+			t.Errorf("method Pay return not nil error, account=>%v", account)
+		}
+		//edit favorite
+		favorite, err := s.FavoritePayment(payment.ID, "auto")
+		if err != nil {
+			t.Errorf("method FavoritePayment returned not nil error, favorite=>%v", favorite)
+		}
+	
+		paymentFavorite, err := s.PayFromFavorite(favorite.ID)
+		if err != nil {
+			t.Errorf("method PayFromFavorite returned nil, paymentFavorite(%v)", paymentFavorite)
+		}
+	}
