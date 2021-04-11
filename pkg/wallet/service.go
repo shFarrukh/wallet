@@ -3,8 +3,8 @@ package wallet
 import (
 	"errors"
 
-	"github.com/shFarrukh/wallet/pkg/types"
 	"github.com/google/uuid"
+	"github.com/shFarrukh/wallet/pkg/types"
 )
 
 var (
@@ -12,6 +12,7 @@ var (
 	ErrAmountMustBePositive = errors.New("amount must be greater than zero")
 	ErrAccountNotFound      = errors.New("account not found")
 	ErrNotEnoughBalance     = errors.New("not enough balance")
+	ErrPaymentNotFound      = errors.New("Payment not found")
 )
 
 type Service struct {
@@ -105,3 +106,32 @@ func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
 
 	return account, nil
 }
+
+func (s *Service) Reject(paymentID string) error {
+	payment, err := s.FindPaymentByID(paymentID)
+	if err != nil {
+		return err
+	}
+
+	account, err := s.FindAccountByID(payment.AccountID)
+
+	if err != nil {
+		return err
+	}
+
+	payment.Status = types.PaymentStatusFail
+	account.Balance += payment.Amount
+	return nil
+}
+
+//FindPaymentByID
+func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
+	for _, payment := range s.payments {
+		if payment.ID == paymentID {
+			return payment, nil
+		}
+	}
+	return nil, ErrPaymentNotFound
+}
+
+
