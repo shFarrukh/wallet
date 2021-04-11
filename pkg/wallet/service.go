@@ -134,4 +134,26 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	return nil, ErrPaymentNotFound
 }
 
+func (s *Service) Repeat(paymentID string) (*types.Payment, error){
+	pay, err := s.FindPaymentByID(paymentID)
+	if err!=nil {
+	return nil, err
+	}
+	
+	payment, err :=s.Pay(pay.AccountID, pay.Amount, pay.Category)
+	if err!=nil {
+	return nil, err
+	}
+	
+	return payment, err
+	}
+	
+	
+	type testServiceUser struct {
+	*Service
+	}
+	
+	func newTestServiceUser() *testServiceUser {
+	return &testServiceUser{Service: &Service{}}
+	}
 
