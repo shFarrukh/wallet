@@ -1,5 +1,7 @@
 package types
 
+
+
 type Money int64
 
 type PaymentCategory string
@@ -34,3 +36,4 @@ type Favorite struct {
 	Amount    Money
 	Category  PaymentCategory
 }
+

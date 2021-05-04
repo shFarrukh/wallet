@@ -828,3 +828,34 @@ func (s Service) FilterPaymentsByFn(filter func(payment types.Payment) bool, gor
 	}
 	return
 }
+type Progress struct {
+	Part   int
+	Result types.Money
+}
+func (s *Service) SumPaymentsWithProgress() <-chan Progress { 
+
+	ch := make(chan Progress,1)
+	defer close(ch)
+	
+	if s.payments == nil {
+		return ch
+	}
+	
+
+	wg := sync.WaitGroup{}	
+	wg.Add(1)
+	
+		go func(ch chan Progress){
+				defer wg.Done()
+				sum:=Progress{}
+
+				for _, value := range s.payments{
+					sum.Result+=value.Amount
+				}	
+					ch<- sum
+				
+		}(ch)
+
+	wg.Wait()
+	return ch
+ }
